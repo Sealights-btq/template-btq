@@ -197,6 +197,3 @@ See the [Development guide](/docs/development-guide.md) to learn how to run and 
   showing Stackdriver Incident Response Management
 
 ---
-# btq-test
-# btq-test
-# btq-test
