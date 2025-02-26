@@ -28,9 +28,9 @@ pipeline {
         }
     }
     environment {
-        SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/tricentis_token' | jq -r '.SecretString' | jq -r '.tricentis_token'" )).trim()
-        IDENTIFIER = 'tricentis.btq.sealights.co'
-        tag = "tricentis_${params.tag}"
+        SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
+        IDENTIFIER = 'template.btq.sealights.co'
+        tag = "template_${params.tag}"
     }
      stages {
         stage("Preparing Spin up") {
@@ -43,10 +43,10 @@ pipeline {
                     IP = "${IDENTIFIER}"
                             stage("Updating Helm") {
                                 sh script: """
-                                    aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/tricentis_key_pair' | jq -r '.SecretString' | jq -r '.tricentis_key_pair' > key.pem
+                                    aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_key_pair' | jq -r '.SecretString' | jq -r '.template_key_pair' > key.pem
                                     chmod 0400 key.pem
 
-                                    ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@tricentis.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
+                                    ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@template.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
                                 """
                             }
                 }

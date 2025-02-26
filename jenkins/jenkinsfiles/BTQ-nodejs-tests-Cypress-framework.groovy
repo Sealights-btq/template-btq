@@ -25,7 +25,7 @@ pipeline {
         stage("Init test"){
             steps{
                 script{
-                git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/tricentis-btq.git'
+                git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/template-btq.git'
                 }
             }
         }

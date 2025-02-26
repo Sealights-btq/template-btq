@@ -32,8 +32,8 @@ pipeline {
     booleanParam(name: 'long_test', defaultValue: false, description: 'Runs a long test for showing tia (not effected by run_all_tests flag)')
   }
   environment {
-    MACHINE_DNS = 'http://tricentis.btq.sealights.co:8081'
-    machine_dns = 'http://tricentis.btq.sealights.co:8081'
+    MACHINE_DNS = 'http://template.btq.sealights.co:8081'
+    machine_dns = 'http://template.btq.sealights.co:8081'
     SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/tricentis_token' | jq -r '.SecretString' | jq -r '.tricentis_token'" )).trim()
     wait_time = "30"
   }
@@ -41,7 +41,7 @@ pipeline {
     stage("Init test"){
       steps{
         script{
-          git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/tricentis-btq.git'
+          git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/template-btq.git'
         }
       }
     }
@@ -49,15 +49,15 @@ pipeline {
       steps{
         script{
           //We're not downloading node agent since it will need to be downloaded in node modules
-          sh """ 
+          sh """
           #mkdir /sealights
           cd /sealights
           #Java agent
           wget -nv https://agents.sealights.co/sealights-java/sealights-java-latest.zip && unzip -o sealights-java-latest.zip && rm sealights-java-latest.zip
-          
+
           #Python agent
           pip install sealights-python-agent
-          
+
           #Dotnet agent
           wget -nv -O sealights-dotnet-agent.tar.gz https://agents.sealights.co/dotnetcore/latest/sealights-dotnet-agent-linux-self-contained.tar.gz && \
           mkdir sl-dotnet-agent && tar -xzf ./sealights-dotnet-agent.tar.gz --directory ./sl-dotnet-agent
@@ -180,7 +180,7 @@ pipeline {
                       export PYTHONPATH="."
                       echo 'robot framework starting ..... '
                       cd ./integration-tests/robot-tests
-                      
+
                       apt-get update && apt-get install -y \
                         ca-certificates \
                         fonts-liberation \
@@ -477,7 +477,7 @@ pipeline {
         }
       }
     }
-    
+
     stage('Long test'){
       steps{
         script{

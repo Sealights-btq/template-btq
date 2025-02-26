@@ -8,11 +8,9 @@ pipeline{
 
   options {
     buildDiscarder logRotator(numToKeepStr: '100')
-    timestamps()
   }
   parameters {
     string(name: 'TAG', defaultValue: '1.2.2', description: 'latest tag')
-    string(name: 'REGION', defaultValue: 'eu-west-1', description: 'latest tag')
     string(name: 'BRANCH', defaultValue: 'main', description: 'default branch')
     choice(name: 'SERVICE', choices: ["adservice","cartservice","checkoutservice", "currencyservice","emailservice","frontend","paymentservice","productcatalogservice","recommendationservice","shippingservice","sealightsservice"], description: 'Service name to build')
     string(name: 'BUILD_NAME', defaultValue: 'none', description: 'build name')
@@ -29,7 +27,7 @@ pipeline{
       steps {
         script {
           // Clone the repository with the specified branch.
-          git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/tricentis-btq.git'
+          git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/template-btq.git'
           currentBuild.displayName = "${SERVICE}-${BUILD_NAME}"
           stage("Build Docker ${params.SERVICE} Image") {
             container(name: 'kaniko'){
