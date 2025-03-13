@@ -16,6 +16,17 @@ spec:
           ephemeral-storage: 200Mi
       securityContext:
         privileged: true
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_SECRET_ACCESS_KEY
     - name: shell
       image: public.ecr.aws/a2q7i5i2/sl-jenkins-base-ci:latest
       command:
@@ -50,5 +61,16 @@ spec:
           memory: 2000Mi
           cpu: 1.5
           ephemeral-storage: 3000Mi
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_SECRET_ACCESS_KEY
       tty: true
       emptyDir: {}

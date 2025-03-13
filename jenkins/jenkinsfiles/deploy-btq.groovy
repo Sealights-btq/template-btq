@@ -24,6 +24,17 @@ pipeline {
                     command:
                     - cat
                     tty: true
+                    env:
+                      - name: AWS_ACCESS_KEY_ID
+                        valueFrom:
+                          secretKeyRef:
+                            name: aws-secret
+                            key: AWS_ACCESS_KEY_ID
+                      - name: AWS_SECRET_ACCESS_KEY
+                        valueFrom:
+                          secretKeyRef:
+                            name: aws-secret
+                            key: AWS_SECRET_ACCESS_KEY
             """
         }
     }
