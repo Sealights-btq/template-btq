@@ -9,7 +9,7 @@ pipeline {
 
   environment {
     machine_dns = 'template.btq.sealights.co'
-    SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
+    SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
   }
 
 
