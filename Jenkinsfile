@@ -143,7 +143,7 @@ def build_btq(Map params){
 
   services_list.each { service ->
     parallelLabs["${service}"] = {
-      build(job: 'BTQ-BUILD', parameters: [string(name: 'SERVICE', value: "${service}"),
+      build(job: 'build_microservice', parameters: [string(name: 'SERVICE', value: "${service}"),
                                            string(name:'TAG' , value:"${params.tag}"),
                                            string(name:'BRANCH' , value:"${params.branch}"),
                                            string(name:'BUILD_NAME' , value:"${params.build_name}")])
