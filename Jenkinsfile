@@ -93,7 +93,7 @@ pipeline {
           lab_alias: "${IDENTIFIER}",
           cdOnly: true,
           )
-          build(job: 'update-btq', parameters: [string(name:'tag' , value:"${env.CURRENT_VERSION}"),
+          build(job: 'deploy-btq', parameters: [string(name:'tag' , value:"${env.CURRENT_VERSION}"),
                                                 string(name:'buildname' , value:build_name),
                                                 string(name:'labid' , value:"${env.LAB_ID}"),
                                                 string(name:'branch' , value:"${params.BRANCH}"),
