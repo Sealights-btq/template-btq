@@ -19,7 +19,7 @@ pipeline{
     ECR_FULL_NAME = "btq-${params.SERVICE}"
     ECR_URI = "474620256508.dkr.ecr.eu-west-1.amazonaws.com/${env.ECR_FULL_NAME}"
     SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
-    TAG = "template_token_${params.TAG}"
+    TAG = "template_${params.TAG}"
   }
 
   stages{
