@@ -1,8 +1,7 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('assert'); // You can use 'assert' for assertions
 
-const httpClient = require('http'); // Assuming you're using Node.js's built-in 'http' module
-const BASE_URL_DEFAULT = "http://10.2.10.50:8081";
+const httpClient = require('https'); // Assuming you're using Node.js's built-in 'https' module
 const BASE_URL = process.env.machine_dns || BASE_URL_DEFAULT;
 
 const products = [
