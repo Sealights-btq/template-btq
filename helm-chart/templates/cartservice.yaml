@@ -34,7 +34,7 @@ spec:
       initContainers:
       - name: dotnet-cd-agent
         image: sealights/dotnetinitcontainer:latest
-        command: ["/bin/sh", "-c", "cp -r /app/sealights /"]
+        command: [ "/bin/sh", "-c", "mv /temp/* /sealights" ]
         volumeMounts:
           - mountPath: /sealights
             name: dotnet-cd-agent-file
@@ -98,9 +98,9 @@ spec:
         volumeMounts:
           - mountPath: /sealights
             name: dotnet-cd-agent-file
-        command: 
+        command:
           - /bin/sh
-          - -c 
+          - -c
           - |
             /sealights/agent/SL.DotNet cdAgent --appName cartservice --branchName ${SL_BRANCH} --buildName ${BUILD_NAME} \
             --binDir /app  --includeNamespace *.services* --target /app/cartservice --token ${SL_TOKEN} --workingDir /app \
