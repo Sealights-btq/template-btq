@@ -32,8 +32,8 @@ pipeline {
     booleanParam(name: 'long_test', defaultValue: false, description: 'Runs a long test for showing tia (not effected by run_all_tests flag)')
   }
   environment {
-    MACHINE_DNS = 'http://template.btq.sealights.co:8081'
-    machine_dns = 'http://template.btq.sealights.co:8081'
+    MACHINE_DNS = 'http://btq-template.btq.sealights.co'
+    machine_dns = 'http://btq-template.btq.sealights.co'
     SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/tricentis_token' | jq -r '.SecretString' | jq -r '.tricentis_token'" )).trim()
     wait_time = "30"
   }
