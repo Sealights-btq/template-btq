@@ -9,4 +9,7 @@ module.exports = defineConfig({
       await registerSealightsTasks(on, config);
      },
   },
+  // Disable screenshots and videos
+  video: false,
+  screenshotOnRunFailure: false
 });

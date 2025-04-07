@@ -3,9 +3,6 @@ const { registerSealightsTasks } = require('sealights-cypress-plugin');
 module.exports = async (on, config) => {
   // Set environment variables for your tests here
   config.env.machine_dns = process.env.MACHINE_DNS; // Use the environment variable if it's set, otherwise use the default value
-  // Disable screenshots and videos
-  config.screenshotOnRunFailure = false;
-  config.video = false;
   await registerSealightsTasks(on, config);
 
   // Log the value of machine_dns (optional)
