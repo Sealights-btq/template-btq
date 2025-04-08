@@ -50,12 +50,12 @@ pipeline {
         script{
           //We're not downloading node agent since it will need to be downloaded in node modules
           sh """
-          #mkdir /sealights
           cd /sealights
           #Java agent
           wget -nv https://agents.sealights.co/sealights-java/sealights-java-latest.zip && unzip -o sealights-java-latest.zip && rm sealights-java-latest.zip
 
           #Python agent
+          apt-get install build-essential python3-dev libssl-dev libffi-dev -y
           pip install sealights-python-agent
 
           #Dotnet agent
