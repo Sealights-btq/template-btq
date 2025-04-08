@@ -95,7 +95,7 @@ When('A user checks out with products', async function () {
             country: "United States",
             credit_card_number: "4432-8015-6152-0454",
             credit_card_expiration_month: "1",
-            credit_card_expiration_year: "2024",
+            credit_card_expiration_year: "2030",
             credit_card_cvv: "672"
         };
 
