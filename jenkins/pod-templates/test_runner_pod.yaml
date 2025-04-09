@@ -27,13 +27,13 @@ spec:
         - infinity
       resources:
         requests:
-          memory: 5000Mi
-          cpu: 2
+          memory: 2000Mi
+          cpu: 1
           ephemeral-storage: 2000Mi
         limits:
-          memory: 7000Mi
-          cpu: 4
-          ephemeral-storage: 10000Mi
+          memory: 3000Mi
+          cpu: 2
+          ephemeral-storage: 5000Mi
       env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
