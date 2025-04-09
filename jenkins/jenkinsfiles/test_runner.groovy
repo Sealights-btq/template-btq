@@ -12,7 +12,7 @@ pipeline {
   }
 
   parameters {
-    string(name: 'BRANCH', defaultValue: 'public', description: 'Branch to clone')
+    string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to clone')
     string(name: 'SL_LABID', defaultValue: '', description: 'Lab_id')
     booleanParam(name: 'Run_all_tests', defaultValue: true, description: 'Checking this box will run all tests even if individual ones are not checked')
     booleanParam(name: 'Cypress', defaultValue: false, description: 'Run tests using Cypress testing framework')
