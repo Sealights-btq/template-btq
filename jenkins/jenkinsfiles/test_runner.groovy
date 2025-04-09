@@ -370,7 +370,7 @@ pipeline {
           if( params.Run_all_tests == true || params.Mocha == true) {
             sh """
                       export machine_dns="${env.MACHINE_DNS}"
-                      cd ./integration-tests/mocha
+                      cd ./integration-tests/nodejs-tests/mocha
                       npm install
                       npm install slnodejs
                       echo 'Mocha framework starting ..... '
