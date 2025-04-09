@@ -4,7 +4,6 @@ metadata:
   annotations:
     "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
 spec:
-  hostNetwork: true
   containers:
     - name: jnlp
       image: jenkins/inbound-agent:latest
@@ -46,26 +45,3 @@ spec:
             secretKeyRef:
               name: aws-secret
               key: AWS_SECRET_ACCESS_KEY
-              env:
-        - name: http_proxy
-          value: http://localhost:15001
-        - name: https_proxy
-          value: http://localhost:15001
-
-    - name: envoy
-      image: envoyproxy/envoy:v1.29-latest
-      command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
-      ports:
-        - containerPort: 15001
-      volumeMounts:
-        - name: envoy-config
-          mountPath: /etc/envoy
-      resources:
-        limits:
-          memory: 200Mi
-          cpu: 100m
-
-  volumes:
-    - name: envoy-config
-      configMap:
-        name: envoy-config
