@@ -13,7 +13,7 @@ pipeline {
     environment {
       NO_COLOR = "true"
       SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
-      MACHINE_DNS = 'http://internal-template.btq.sealights.co'
+      MACHINE_DNS = 'http://internal-template.btq.sealights.co:8081'
     }
     options{
         buildDiscarder logRotator(numToKeepStr: '10')
