@@ -10,21 +10,6 @@ const products = [
     "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"
 ];
 
-Given('There are {int} users', function (numUsers) {
-    // No need for threads in JavaScript, perform actions sequentially
-    for (let i = 0; i < numUsers; i++) {
-        testSession();
-    }
-});
-
-When('All users start their sessions', function () {
-    // In JavaScript, actions are performed sequentially, so no need for this step
-});
-
-Then('All sessions should complete successfully', function () {
-    // Post-execution checks, if any.
-});
-
 Given('A product list', function () {
     // Assuming products are already initialized at the top
 });
@@ -38,15 +23,6 @@ When('A user browses products', async function () {
 Then('All products should be accessible', function () {
     // Assuming if the previous step passes, all products are accessible.
 });
-
-async function testSession() {
-    try {
-        const response = await sendHttpRequest(BASE_URL + "/");
-        assert.strictEqual(response.statusCode, 200, "Failed to load the homepage");
-    } catch (error) {
-        throw new Error("Failed to load the homepage: " + error.message);
-    }
-}
 
 When('A user views their cart', async function () {
     try {
@@ -124,7 +100,7 @@ async function sendHttpPostRequest(url, data) {
 
     const options = {
         hostname: BASE_URL,
-        port: 80,
+        port: 8081,
         path: url,
         method: 'POST',
         headers: {
