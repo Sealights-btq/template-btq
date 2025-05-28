@@ -25,27 +25,17 @@ spec:
       resources:
         requests:
           memory: 300Mi
-          cpu: 0.5
+          cpu: "0.5"
           ephemeral-storage: 500Mi
         limits:
           memory: 500Mi
-          cpu: 1.0
+          cpu: "1.0"
           ephemeral-storage: 1000Mi
       securityContext:
         privileged: true
         allowPrivilegeEscalation: true
         runAsUser: 1000
-      env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: aws-secret
-              key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: aws-secret
-              key: AWS_SECRET_ACCESS_KEY
+
     - name: kaniko
       image: gcr.io/kaniko-project/executor:debug
       command:
@@ -55,22 +45,11 @@ spec:
       resources:
         requests:
           memory: 1000Mi
-          cpu: 0.5
+          cpu: "0.5"
           ephemeral-storage: 1000Mi
         limits:
           memory: 2000Mi
-          cpu: 1.5
+          cpu: "1.5"
           ephemeral-storage: 3000Mi
-      env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: aws-secret
-              key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: aws-secret
-              key: AWS_SECRET_ACCESS_KEY
+
       tty: true
-      emptyDir: {}

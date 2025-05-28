@@ -36,12 +36,14 @@ pipeline {
         stage("Uninstalling helm") {
             steps {
                 script {
+                    withCredentials([string(credentialsId: 'ssh-key', variable: 'SSH_KEY')]) {
                         sh script: """
-                            aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_key_pair' | jq -r '.SecretString' | jq -r '.template_key_pair' > key.pem
+                            echo '${SSH_KEY}' > key.pem
                             chmod 0400 key.pem
 
                             ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@template.btq.sealights.co 'export KUBECONFIG=\$(k3d kubeconfig write btq) && helm uninstall btq'
                         """
+                    }
                 }
             }
         }

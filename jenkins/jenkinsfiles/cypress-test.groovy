@@ -12,15 +12,12 @@ pipeline {
     }
     environment {
       NO_COLOR = "true"
-      SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
       MACHINE_DNS = 'http://internal-template.btq.sealights.co:8081'
     }
     options{
         buildDiscarder logRotator(numToKeepStr: '10')
         timestamps()
     }
-
-
 
     stages{
         stage("Init test"){
@@ -31,25 +28,25 @@ pipeline {
             }
         }
 
-
         stage('download NodeJs agent and scanning Cypress tests') {
             steps{
                 script{
-                    sh """
-                    cd integration-tests/cypress/
-                    npm install
-                    npm install sealights-cypress-plugin
-                    export NODE_DEBUG=sl
-                    export CYPRESS_SL_ENABLE_REMOTE_AGENT=true
-                    export CYPRESS_SL_TEST_STAGE="Cypress-Test-Stage"
-                    export CYPRESS_machine_dns="${env.MACHINE_DNS}"
-                    export CYPRESS_SL_LAB_ID="${params.SL_LABID}"
-                    export CYPRESS_SL_TOKEN="${env.SL_TOKEN}"
-                    npx cypress run
-                    """
+                    withCredentials([string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')]) {
+                        sh """
+                        cd integration-tests/cypress/
+                        npm install
+                        npm install sealights-cypress-plugin
+                        export NODE_DEBUG=sl
+                        export CYPRESS_SL_ENABLE_REMOTE_AGENT=true
+                        export CYPRESS_SL_TEST_STAGE="Cypress-Test-Stage"
+                        export CYPRESS_machine_dns="${env.MACHINE_DNS}"
+                        export CYPRESS_SL_LAB_ID="${params.SL_LABID}"
+                        export CYPRESS_SL_TOKEN="${env.SL_TOKEN}"
+                        npx cypress run
+                        """
+                    }
                 }
             }
         }
     }
-
 }

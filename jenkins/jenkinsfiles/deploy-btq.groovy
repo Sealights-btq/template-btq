@@ -39,7 +39,6 @@ pipeline {
         }
     }
     environment {
-        SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
         IDENTIFIER = 'btq-template.btq.sealights.co'
         tag = "template_${params.tag}"
     }
@@ -47,19 +46,24 @@ pipeline {
         stage("Preparing Spin up") {
             steps {
                 script {
-                    cleanWs()
-                    ENV_NAME = "${IDENTIFIER}"
-                    currentBuild.displayName = "${ENV_NAME} btq update"
-                    LOWER_ENV_NAME = "${ENV_NAME}".toLowerCase()
-                    IP = "${IDENTIFIER}"
-                            stage("Updating Helm") {
-                                sh script: """
-                                    aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_key_pair' | jq -r '.SecretString' | jq -r '.template_key_pair' > key.pem
-                                    chmod 0400 key.pem
+                    withCredentials([
+                        string(credentialsId: 'sealights-token', variable: 'SL_TOKEN'),
+                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
+                    ]) {
+                        cleanWs()
+                        ENV_NAME = "${IDENTIFIER}"
+                        currentBuild.displayName = "${ENV_NAME} btq update"
+                        LOWER_ENV_NAME = "${ENV_NAME}".toLowerCase()
+                        IP = "${IDENTIFIER}"
+                                stage("Updating Helm") {
+                                    sh script: """
+                                        echo '${SSH_KEY}' > key.pem
+                                        chmod 0400 key.pem
 
-                                    ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@internal-template.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
-                                """
-                            }
+                                        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@internal-template.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
+                                    """
+                                }
+                    }
                 }
             }
         }

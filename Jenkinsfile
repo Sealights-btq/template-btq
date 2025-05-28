@@ -1,4 +1,3 @@
-
 pipeline {
   agent {
     kubernetes {
@@ -9,9 +8,7 @@ pipeline {
 
   environment {
     machine_dns = 'template.btq.sealights.co'
-    SL_TOKEN = (sh(returnStdout: true, script:"aws secretsmanager get-secret-value --region eu-west-1 --secret-id 'btq/template_token' | jq -r '.SecretString' | jq -r '.template_token'" )).trim()
   }
-
 
   parameters {
     separator(name: "App parameters", sectionHeader: "App parameters",separatorStyle: "border-width: 5",
@@ -66,38 +63,47 @@ pipeline {
     stage('Build BTQ') {
       steps {
         script {
-          env.CURRENT_VERSION = "1-0-${BUILD_NUMBER}"
-          build_btq(
-            sl_token: env.SL_TOKEN,
-            build_name: "${params.BUILD_NAME}" == "" ? "${params.BRANCH}-${env.CURRENT_VERSION}" : "${params.BUILD_NAME}",
-            branch: params.BRANCH,
-            tag: env.CURRENT_VERSION,
-          )
+          withCredentials([
+            usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'),
+            string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')
+          ]) {
+            env.CURRENT_VERSION = "1-0-${BUILD_NUMBER}"
+            build_btq(
+              sl_token: env.SL_TOKEN,
+              build_name: "${params.BUILD_NAME}" == "" ? "${params.BRANCH}-${env.CURRENT_VERSION}" : "${params.BUILD_NAME}",
+              branch: params.BRANCH,
+              tag: env.CURRENT_VERSION,
+            )
+          }
         }
       }
     }
 
-
     stage('update-btq') {
       steps {
         script {
-          def build_name = "${params.BUILD_NAME}" == "" ? "${params.BRANCH}-${env.CURRENT_VERSION}" : "${params.BUILD_NAME}"
-          env.CURRENT_VERSION = "1-0-${BUILD_NUMBER}"
-          def IDENTIFIER= "${params.BRANCH}-${env.CURRENT_VERSION}"
-          env.LAB_ID = create_lab_id(
-          token: "${env.SL_TOKEN}",
-          machine: "https://public-btq.sealights.co",
-          app: "${params.APP_NAME}",
-          branch: "${params.BRANCH}",
-          test_env: "${IDENTIFIER}",
-          lab_alias: "${IDENTIFIER}",
-          cdOnly: true,
-          )
-          build(job: 'deploy-btq', parameters: [string(name:'tag' , value:"${env.CURRENT_VERSION}"),
-                                                string(name:'buildname' , value:build_name),
-                                                string(name:'labid' , value:"${env.LAB_ID}"),
-                                                string(name:'branch' , value:"${params.BRANCH}"),
-                                                string(name:'token' , value:"${env.SL_TOKEN}")])
+          withCredentials([
+            usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'),
+            string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')
+          ]) {
+            def build_name = "${params.BUILD_NAME}" == "" ? "${params.BRANCH}-${env.CURRENT_VERSION}" : "${params.BUILD_NAME}"
+            env.CURRENT_VERSION = "1-0-${BUILD_NUMBER}"
+            def IDENTIFIER= "${params.BRANCH}-${env.CURRENT_VERSION}"
+            env.LAB_ID = create_lab_id(
+            token: "${env.SL_TOKEN}",
+            machine: "https://public-btq.sealights.co",
+            app: "${params.APP_NAME}",
+            branch: "${params.BRANCH}",
+            test_env: "${IDENTIFIER}",
+            lab_alias: "${IDENTIFIER}",
+            cdOnly: true,
+            )
+            build(job: 'deploy-btq', parameters: [string(name:'tag' , value:"${env.CURRENT_VERSION}"),
+                                                  string(name:'buildname' , value:build_name),
+                                                  string(name:'labid' , value:"${env.LAB_ID}"),
+                                                  string(name:'branch' , value:"${params.BRANCH}"),
+                                                  string(name:'token' , value:"${env.SL_TOKEN}")])
+          }
         }
       }
     }
@@ -105,36 +111,36 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          run_tests(
-            branch: params.BRANCH,
-            lab_id: env.LAB_ID,
-            token: env.SL_TOKEN,
-            Run_all_tests: params.Run_all_tests,
-            Cucumber: params.Cucumber,
-            Cypress: params.Cypress,
-            Junit_with_testNG: params.Junit_with_testNG,
-            Junit_without_testNG: params.Junit_without_testNG,
-            Junit_with_testNG_gradle: params.Junit_with_testNG_gradle,
-            Mocha: params.Mocha,
-            MS: params.Mocha,
-            NUnit: params.NUnit,
-            Postman: params.Postman,
-            Pytest: params.Pytest,
-            Robot: params.Robot,
-            Soapui: params.Soapui,
-            long_test: params.long_test
-          )
+          withCredentials([
+            string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')
+          ]) {
+            run_tests(
+              branch: params.BRANCH,
+              lab_id: env.LAB_ID,
+              token: env.SL_TOKEN,
+              Run_all_tests: params.Run_all_tests,
+              Cucumber: params.Cucumber,
+              Cypress: params.Cypress,
+              Junit_with_testNG: params.Junit_with_testNG,
+              Junit_without_testNG: params.Junit_without_testNG,
+              Junit_with_testNG_gradle: params.Junit_with_testNG_gradle,
+              Mocha: params.Mocha,
+              MS: params.Mocha,
+              NUnit: params.NUnit,
+              Postman: params.Postman,
+              Pytest: params.Pytest,
+              Robot: params.Robot,
+              Soapui: params.Soapui,
+              long_test: params.long_test
+            )
+          }
         }
       }
     }
-
   }
 }
 
-
 def build_btq(Map params){
-
-
   def parallelLabs = [:]
   //List of all the images name
 
@@ -151,7 +157,6 @@ def build_btq(Map params){
   }
   parallel parallelLabs
 }
-
 
 def run_tests(Map params){
       sleep time: 120, unit: 'SECONDS'
@@ -173,23 +178,26 @@ def run_tests(Map params){
         booleanParam(name: 'Soapui', value: params.Soapui),
         booleanParam(name: 'long_test', value: params.long_test)
       ])
-
 }
 
 def set_assume_role(Map params) {
-  params.set_globaly = params.set_globaly == null ? true : params.set_globaly
-  def credential_map = sh (returnStdout: true, script: """
-                                aws sts assume-role --role-arn arn:aws:iam::${params.account_id}:role/${params.role_name}  \\
-                                --role-session-name ${params.env}-access --query \"Credentials\"
-                            """).replace('"', '').replaceAll('[\\s]', '').trim()
+  withCredentials([
+    usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
+  ]) {
+    params.set_globaly = params.set_globaly == null ? true : params.set_globaly
+    def credential_map = sh (returnStdout: true, script: """
+                                  aws sts assume-role --role-arn arn:aws:iam::${params.account_id}:role/${params.role_name}  \\
+                                  --role-session-name ${params.env}-access --query \"Credentials\"
+                              """).replace('"', '').replaceAll('[\\s]', '').trim()
 
-  def map = convert_to_map(credential_map)
-  if (params.set_globaly) {
-    env.AWS_ACCESS_KEY_ID = "${map.AccessKeyId}"
-    env.AWS_SECRET_ACCESS_KEY = "${map.SecretAccessKey}"
-    env.AWS_SESSION_TOKEN = "${map.SessionToken}"
-  } else {
-    return map
+    def map = convert_to_map(credential_map)
+    if (params.set_globaly) {
+      env.AWS_ACCESS_KEY_ID = "${map.AccessKeyId}"
+      env.AWS_SECRET_ACCESS_KEY = "${map.SecretAccessKey}"
+      env.AWS_SESSION_TOKEN = "${map.SessionToken}"
+    } else {
+      return map
+    }
   }
 }
 
