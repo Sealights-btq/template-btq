@@ -15,17 +15,7 @@ pipeline {
                     command:
                     - cat
                     tty: true
-                    env:
-                      - name: AWS_ACCESS_KEY_ID
-                        valueFrom:
-                          secretKeyRef:
-                            name: aws-secret
-                            key: AWS_ACCESS_KEY_ID
-                      - name: AWS_SECRET_ACCESS_KEY
-                        valueFrom:
-                          secretKeyRef:
-                            name: aws-secret
-                            key: AWS_SECRET_ACCESS_KEY
+
             """
         }
     }
@@ -36,12 +26,12 @@ pipeline {
         stage("Uninstalling helm") {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'ssh-key', variable: 'SSH_KEY')]) {
+                    withCredentials([
+                        sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY_FILE', usernameVariable: 'SSH_USER')
+                    ]) {
                         sh script: """
-                            echo '${SSH_KEY}' > key.pem
-                            chmod 0400 key.pem
-
-                            ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@template.btq.sealights.co 'export KUBECONFIG=\$(k3d kubeconfig write btq) && helm uninstall btq'
+                            chmod 0400 ${SSH_KEY_FILE}
+                            ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_FILE} ${SSH_USER}@template.btq.sealights.co 'export KUBECONFIG=\$(k3d kubeconfig write btq) && helm uninstall btq'
                         """
                     }
                 }

@@ -24,17 +24,6 @@ pipeline {
                     command:
                     - cat
                     tty: true
-                    env:
-                      - name: AWS_ACCESS_KEY_ID
-                        valueFrom:
-                          secretKeyRef:
-                            name: aws-secret
-                            key: AWS_ACCESS_KEY_ID
-                      - name: AWS_SECRET_ACCESS_KEY
-                        valueFrom:
-                          secretKeyRef:
-                            name: aws-secret
-                            key: AWS_SECRET_ACCESS_KEY
             """
         }
     }
@@ -48,7 +37,7 @@ pipeline {
                 script {
                     withCredentials([
                         string(credentialsId: 'sealights-token', variable: 'SL_TOKEN'),
-                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
+                        sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY_FILE', usernameVariable: 'SSH_USER')
                     ]) {
                         cleanWs()
                         ENV_NAME = "${IDENTIFIER}"
@@ -57,10 +46,8 @@ pipeline {
                         IP = "${IDENTIFIER}"
                                 stage("Updating Helm") {
                                     sh script: """
-                                        echo '${SSH_KEY}' > key.pem
-                                        chmod 0400 key.pem
-
-                                        ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@internal-template.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
+                                        chmod 0400 ${SSH_KEY_FILE}
+                                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_FILE} ${SSH_USER}@internal-template.btq.sealights.co 'bash /opt/sealights/install-btq.sh --tag=${env.tag} --buildname=${params.buildname} --labid=${params.labid} --branch=${params.branch} --token=${env.SL_TOKEN} --sl_branch=${params.branch}'
                                     """
                                 }
                     }
@@ -68,4 +55,5 @@ pipeline {
             }
         }
     }
+}
 }
