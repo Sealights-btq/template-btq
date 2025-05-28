@@ -25,7 +25,10 @@ pipeline{
     stage('Init') {
       steps {
         script {
-          withCredentials([string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')]) {
+          withCredentials([
+            aws(credentialsId: 'aws-ecr-creds', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'),
+            string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')
+          ]) {
             // Clone the repository with the specified branch.
             git branch: params.BRANCH, url: 'https://github.com/Sealights-btq/template-btq.git'
             currentBuild.displayName = "${SERVICE}-${BUILD_NAME}"
