@@ -72,8 +72,9 @@ pipeline {
             if( params.Run_all_tests == true || params.Cypress == true) {
               build(job:"cypress-test", parameters: [string(name: 'BRANCH', value: "${params.BRANCH}"),string(name: 'SL_LABID', value: "${params.SL_LABID}") , string(name:'SL_TOKEN' , value:"${env.SL_TOKEN}") ,string(name:'MACHINE_DNS1' , value:"${env.MACHINE_DNS}")])
             }
+          }
+        }
       }
-    }
     }
     stage('MS-Tests framework'){
       steps{
@@ -88,6 +89,7 @@ pipeline {
                   dotnet /sealights/sl-dotnet-agent/SL.DotNet.dll endExecution --testStage "MS-Tests" --labId ${params.SL_LABID} --token ${env.SL_TOKEN}
                   sleep ${env.wait_time} # Wait at least 10 seconds for the backend to update status that the previous test stage was closed, closing and starting a test stage withing 10 seconds can cause inaccurate test stage coverage
                   """
+            }
           }
         }
       }
@@ -115,11 +117,11 @@ pipeline {
                     ./node_modules/.bin/slnodejs end --tokenfile ./sltoken.txt --labid ${params.SL_LABID}
                     sleep ${env.wait_time}
                     """
+            }
           }
         }
       }
     }
-
 
     stage('N-Unit framework starting'){
       steps{
@@ -134,11 +136,11 @@ pipeline {
                     dotnet /sealights/sl-dotnet-agent/SL.DotNet.dll endExecution --testStage "NUnit-Tests" --labId ${params.SL_LABID} --token ${env.SL_TOKEN}
                     sleep ${env.wait_time}
                     """
+            }
           }
         }
       }
     }
-
 
     stage('Gradle'){
       steps{
@@ -164,12 +166,12 @@ pipeline {
                             "sealightsJvmParams": {}
                         }' > slgradletests.json
 
-
                         echo "Adding Sealights to Tests Project gradle file..."
                         java -jar /sealights/sl-build-scanner.jar -gradle -configfile slgradletests.json -workspacepath .
                         gradle test
                         sleep ${env.wait_time}
                         """
+            }
           }
         }
       }
@@ -210,6 +212,7 @@ pipeline {
                         cd ../..
                         sleep ${env.wait_time}
                         """
+            }
           }
         }
       }
@@ -247,12 +250,11 @@ pipeline {
                 ./mvnw -q test
                 sleep ${env.wait_time}
                 """
+            }
           }
         }
       }
     }
-
-
 
     stage('Junit support testNG framework'){
       steps{
@@ -285,11 +287,11 @@ pipeline {
                         mvn -q clean package
                         sleep ${env.wait_time}
                         """
+            }
           }
         }
       }
     }
-
 
     stage('Junit without testNG '){
       steps{
@@ -323,11 +325,11 @@ pipeline {
                         mvn -q clean package
                         sleep ${env.wait_time}
                         """
+            }
           }
         }
       }
     }
-
 
     stage('Postman framework'){
       steps{
@@ -352,28 +354,6 @@ pipeline {
       }
     }
 
-
-    // stage('Jest framework'){
-    //   steps{
-    //     script{
-    //
-    //       sh """
-    //             echo 'Jest framework starting ..... '
-    //             export machine_dns="${env.MACHINE_DNS}"
-    //             cd ./integration-tests/Jest
-    //             npm install jest && npm install jest-cli && npm install sealights-jest-plugin
-    //             export NODE_DEBUG=sl
-    //             export SL_TOKEN="${env.SL_TOKEN}"
-    //             export SL_LABID="${params.SL_LABID}"
-    //             npm install
-    //             npx jest integration-tests/nodejs-tests/Jest/test.js --sl-testStage='Jest tests' --sl-token="${env.SL_TOKEN}" --sl-labId="${params.SL_LABID}"
-    //             cd ../..
-    //             sleep ${env.wait_time}
-    //         """
-    //     }
-    //   }
-    // }
-
     stage('Mocha framework'){
       steps{
         script{
@@ -394,8 +374,6 @@ pipeline {
         }
       }
     }
-
-
 
     stage('Soap-UI framework'){
       steps{
