@@ -103,7 +103,7 @@ spec:
           - -c
           - |
             /sealights/agent/SL.DotNet cdAgent --appName cartservice --branchName ${SL_BRANCH} --buildName ${BUILD_NAME} \
-            --binDir /app  --includeNamespace *.services* --target /app/cartservice --token ${SL_TOKEN} --workingDir /app \
+            --binDir /app  --includeNamespace 'cartservice*' --includedAssemblies 'cartservice*' --target /app/cartservice --token ${SL_TOKEN} --workingDir /app \
             --identifyMethodsByFqn --labId ${SL_LAB_ID}
       volumes:
       - name: dotnet-cd-agent-file

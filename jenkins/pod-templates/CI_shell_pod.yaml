@@ -30,4 +30,4 @@ spec:
         limits:
           memory: 1000Mi
           cpu: "1"
-          ephemeral-storage: 10000Mi
+          ephemeral-storage: 3000Mi
