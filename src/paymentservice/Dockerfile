@@ -27,19 +27,25 @@ RUN apk add --update --no-cache \
     make \
     g++
 
+# Enable corepack and install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /usr/src/app
 
 #COPY package*.json ./
 COPY . .
-RUN npm install --only=production
+RUN pnpm install --prod
 #Install the agent (Not a url)
-RUN npm i ${SEALIGHTS_NODE_AGENT}
+RUN pnpm add ${SEALIGHTS_NODE_AGENT}
 #Run config to get build session id
-RUN  ./node_modules/.bin/slnodejs config --token ${SEALIGHTS_TOKEN} --appname "paymentservice" --branch ${BRANCH} --build ${BUILD_NAME}
+RUN  pnpm exec slnodejs config --token ${SEALIGHTS_TOKEN} --appname "paymentservice" --branch ${BRANCH} --build ${BUILD_NAME}
 #Scan the code
-RUN ./node_modules/.bin/slnodejs scan --token ${SEALIGHTS_TOKEN} --buildsessionidfile buildSessionId --workspacepath "." --scm none --es6Modules
+RUN pnpm exec slnodejs scan --token ${SEALIGHTS_TOKEN} --buildsessionidfile buildSessionId --workspacepath "." --scm none --es6Modules
 
 FROM base
+
+# Enable corepack and install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /usr/src/app
 #Copy the build session id file
@@ -50,4 +56,4 @@ COPY . .
 ENV NODE_DEBUG=sl
 EXPOSE 50051
 #Run code with sealights
-CMD  ./node_modules/.bin/slnodejs run --token "${SL_TOKEN}" --buildsessionidfile buildSessionId --labid "${SL_LAB_ID}" --workspacepath . index.js
+CMD  pnpm exec slnodejs run --token "${SL_TOKEN}" --buildsessionidfile buildSessionId --labid "${SL_LAB_ID}" --workspacepath . index.js
