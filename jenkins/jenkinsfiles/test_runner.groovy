@@ -44,6 +44,16 @@ pipeline {
         }
       }
     }
+    stage("Setup pnpm") {
+      steps {
+        script {
+          sh """
+            corepack enable || true
+            corepack prepare pnpm@latest --activate || npm install -g pnpm
+          """
+        }
+      }
+    }
     stage("Downloading agents"){
       steps{
         script{
@@ -104,7 +114,7 @@ pipeline {
                     echo 'Cucumberjs framework starting ..... '
                     cd integration-tests/Cucumber-js
                     echo ${env.SL_TOKEN}>sltoken.txt
-                    npm install @cucumber/cucumber axios sealights-cucumber-plugin
+                    pnpm install @cucumber/cucumber axios sealights-cucumber-plugin
                     export SL_PACKAGE=\$(node -p "require.resolve('sealights-cucumber-plugin')")
                     export machine_dns="${env.MACHINE_DNS}"
                     echo '{
@@ -339,7 +349,7 @@ pipeline {
               sh """
                       export MACHINE_DNS="${env.MACHINE_DNS}"
                       cd ./integration-tests/postman-tests/
-                      npm install sealights-newman-wrapper newman-reporter-xunit newman-reporter-junit5 slnodejs
+                      pnpm install sealights-newman-wrapper newman-reporter-xunit newman-reporter-junit5 slnodejs
                       echo 'Postman framework starting ..... '
                       ./node_modules/.bin/slnodejs start --labid ${params.SL_LABID} --token ${env.SL_TOKEN} --teststage "postman tests"
                       sleep 10
@@ -362,8 +372,8 @@ pipeline {
               sh """
                         export machine_dns="${env.MACHINE_DNS}"
                         cd ./integration-tests/nodejs-tests/mocha
-                        npm install
-                        npm install slnodejs
+                        pnpm install
+                        pnpm install slnodejs
                         echo 'Mocha framework starting ..... '
                         ./node_modules/.bin/slnodejs mocha --token "${env.SL_TOKEN}" --labid "${params.SL_LABID}" --teststage 'Mocha tests'  --useslnode2 -- ./test/test.js --recursive --no-timeouts
                         cd ../..

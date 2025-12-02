@@ -27,6 +27,16 @@ pipeline {
                 }
             }
         }
+        stage("Setup pnpm") {
+          steps {
+            script {
+              sh """
+                corepack enable || true
+                corepack prepare pnpm@latest --activate || npm install -g pnpm
+              """
+            }
+          }
+        }
 
         stage('download NodeJs agent and scanning Cypress tests') {
             steps{
@@ -34,8 +44,8 @@ pipeline {
                     withCredentials([string(credentialsId: 'sealights-token', variable: 'SL_TOKEN')]) {
                         sh """
                         cd integration-tests/cypress/
-                        npm install
-                        npm install sealights-cypress-plugin
+                        pnpm install
+                        pnpm install sealights-cypress-plugin
                         export NODE_DEBUG=sl
                         export CYPRESS_SL_ENABLE_REMOTE_AGENT=true
                         export CYPRESS_SL_TEST_STAGE="Cypress-Test-Stage"
