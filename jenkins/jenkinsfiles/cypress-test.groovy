@@ -46,13 +46,14 @@ pipeline {
                         cd integration-tests/cypress/
                         pnpm install
                         pnpm install sealights-cypress-plugin
+                        pnpm exec cypress install
                         export NODE_DEBUG=sl
                         export CYPRESS_SL_ENABLE_REMOTE_AGENT=true
                         export CYPRESS_SL_TEST_STAGE="Cypress-Test-Stage"
                         export CYPRESS_machine_dns="${env.MACHINE_DNS}"
                         export CYPRESS_SL_LAB_ID="${params.SL_LABID}"
                         export CYPRESS_SL_TOKEN="${env.SL_TOKEN}"
-                        npx cypress run
+                        pnpm exec cypress run
                         """
                     }
                 }

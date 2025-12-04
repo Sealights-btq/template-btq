@@ -12,8 +12,8 @@ RUN apk add --update --no-cache \
     make \
     g++
 
-# Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@latest
 
 WORKDIR /usr/src/app
 
@@ -25,10 +25,10 @@ RUN pnpm add ${SEALIGHTS_NODE_AGENT}
 
 FROM alpine:3.20.3@sha256:1e42bbe2508154c9126d48c2b8a75420c3544343bf86fd041fb7527e017a4b4a
 
-RUN apk add --no-cache nodejs
+RUN apk add --no-cache nodejs npm
 
-# Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@latest
 
 WORKDIR /usr/src/app
 

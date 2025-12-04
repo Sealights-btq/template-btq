@@ -27,8 +27,8 @@ RUN apk add --update --no-cache \
     make \
     g++
 
-# Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@latest
 
 WORKDIR /usr/src/app
 
@@ -44,8 +44,8 @@ RUN pnpm exec slnodejs scan --token ${SEALIGHTS_TOKEN} --buildsessionidfile buil
 
 FROM base
 
-# Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@latest
 
 WORKDIR /usr/src/app
 #Copy the build session id file
